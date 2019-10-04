@@ -4,28 +4,32 @@
 #include <ctype.h>
 #include <stdio.h>
 
-void main(FILE* inputFile, FILE* outputFile) {
-	char* inputCont;
-	char* outputCont;
-	int fileCharCount = 0;
+void main(char* input) {
+	// char* inputCont;
+	// int fileCharCount = 0;
 
-	FILE* fp = fopen(inputFile, "r");
+	FILE *fp = fopen(input, "r");
+	input = calloc(10, sizeof(char));
+	// char c;
+	// for(c = getc(fp); c != EOF; c = getc(fp))
+	// 	fileCharCount = fileCharCount + 1;
 
-	char c;
-	for(c = getc(fp); c != EOF; c = getc(fp))
-		fileCharCount = fileCharCount + 1;
+	// printf("this is the charCont" + fileCharCount);
 
-	print("this is the charCont" + fileCharCount);
+	// inputCont = (char*) calloc(10, sizeof(char));
 
-	fgets(inputCont, fileCharCount ,inputFile);
+	// fgets(inputCont, fileCharCount ,fp);
 
-	fclose(inputFile);
+	fclose(fp);
 
 	printf("Here is actual inputCont");
-	printf(inputCont);
+	printf(input);
+
+	free(input);
+	// free(inputCont);
 
 	// int charCount = strlen(inputCont);
 
 	// copy_non_vowels(charCount, inputCont, outputCont);
-	inputCont > outputFile;
+	// inputCont > outputFile;
 }
