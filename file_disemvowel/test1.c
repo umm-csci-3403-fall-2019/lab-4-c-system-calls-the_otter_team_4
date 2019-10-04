@@ -4,32 +4,38 @@
 #include <ctype.h>
 #include <stdio.h>
 
-void main(char* input) {
-	// char* inputCont;
-	// int fileCharCount = 0;
+void main(int argc, char *argv[]) {
 
-	FILE *fp = fopen(input, "r");
-	input = calloc(10, sizeof(char));
-	// char c;
-	// for(c = getc(fp); c != EOF; c = getc(fp))
-	// 	fileCharCount = fileCharCount + 1;
+	FILE *inputFile;
+    FILE *outputFile;
 
-	// printf("this is the charCont" + fileCharCount);
+	if (argc == 1) {
+		inputFile = stdin;
+		printf("Only one argument. \n");
+		char string[256];
+		printf( "Please enter a string. \n" );
+		fgets(string, 256, stdin);
+		printf(string);
+	}
 
-	// inputCont = (char*) calloc(10, sizeof(char));
+	if (argc == 2) {
 
-	// fgets(inputCont, fileCharCount ,fp);
+		// This buffer might need to be resized for larger files
+   		char buffer[190];
 
-	fclose(fp);
+   		/* Open file for reading*/
+   		inputFile = fopen(argv[1], "r");
 
-	printf("Here is actual inputCont");
-	printf(input);
+	    /* Read and display data */
+   		fread(buffer, sizeof(char), 1000, inputFile);
+   		printf("%s\n", buffer);
+   		fclose(inputFile);
 
-	free(input);
-	// free(inputCont);
+	}
 
-	// int charCount = strlen(inputCont);
+	if (argc == 3) {
+		printf("There were 3 args recieved. To be continued...");
+	}
 
-	// copy_non_vowels(charCount, inputCont, outputCont);
-	// inputCont > outputFile;
+
 }
