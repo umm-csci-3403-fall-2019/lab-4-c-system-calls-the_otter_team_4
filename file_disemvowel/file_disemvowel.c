@@ -18,59 +18,51 @@ bool isvowel(char const c) {
 
 int copy_non_vowels(int num_chars, char* in_buf, char* out_buf){
 	int i, len, nvlen, pos;
-	char* outstr;
 	
-	char* instr = in_buf;
-	len = strlen(instr) + 1;
+	len = strlen(in_buf) + 1;
 	// non-vowel length
 	nvlen = 0;
 
 	// Loop through the input string and count the non-vowel characters
 	for(i=0; i<len; ++i) {
-		if(!isvowel(instr[i])) {
+		if(!isvowel(in_buf[i])) {
 			nvlen++;
 		}
 	}
 	
-	outstr = (char*) calloc(nvlen, sizeof(char));
+	//out_buf = (char*) calloc(nvlen, sizeof(char));
 	
 	// Tracks position in output string
 	pos = 0;
 	
 	// Loops through input string and adds non-vowel characters to output string
 	for(i=0; i<len; ++i) {
-		if(!isvowel(instr[i])) {
-			outstr[pos] = instr[i];
+		if(!isvowel(in_buf[i])) {
+			out_buf[pos] = in_buf[i];
 			pos++;
 		}
 	}
 
-	out_buf = outstr;
 	return nvlen;
 }
 
 void disemvowel(FILE* inputFile, FILE* outputFile) {
-	char * buffer = 0;
-	long length;
+	char * buffer = calloc(BUF_SIZE, sizeof(char));
+	char * out_buf = calloc(BUF_SIZE, sizeof(char));
+	//long length;
 
-	fseek (inputFile, 0, SEEK_END);
-	length = ftell (inputFile);
+	while( fread(buffer, sizeof(char), BUF_SIZE, inputFile) != 0){
+		int nvlen = copy_non_vowels(BUF_SIZE, buffer, out_buf);
+		fwrite(out_buf, sizeof(char), nvlen, outputFile);
+	}
 
-  	fseek (inputFile, 0, SEEK_SET);
-  	buffer = malloc (length);
-
-  	if (buffer)
-  	{
-    	fread (buffer, 1, length, inputFile);
-  	}
+	free(buffer);
+	free(out_buf);
 
   	fclose (inputFile);
+  	fclose(outputFile);
 
-  	char * out_buf;
-
-  	int nvlen = copy_non_vowels(length, buffer, out_buf);
-
-  	printf(out_buf);
+  
 
 }
 
@@ -86,6 +78,7 @@ void main(int argc, char *argv[]) {
 	if (argc == 1) {
 		inputFile = stdin;
 		outputFile = stdout;
+
 	}
 
 	if (argc == 2) {
@@ -104,4 +97,5 @@ void main(int argc, char *argv[]) {
 	}
 
 	disemvowel(inputFile, outputFile);
+
 }
