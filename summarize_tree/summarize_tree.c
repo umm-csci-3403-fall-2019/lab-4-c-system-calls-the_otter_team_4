@@ -93,6 +93,7 @@ void process_directory(const char* path) {
 
 	   // If it IS A DIRECTORY...call process directory recursively.
 	   // Note: This is not ready to run. chdir() needs to happen at some point before the recursion
+	   // Also: See Nic's notes above on the '.' and '..' directories
 	   if (is_dir(dp->d_name)) {
 	      process_directory(dp->d_name);
 	   } else {
