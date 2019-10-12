@@ -25,13 +25,43 @@ bool is_dir(const char* path) {
       perror("stat");
    }
 
-   // Check to see if is a directory
+   // Check to see if is a directory...otherwise return break and return false
    switch (buf.st_mode & S_IFMT)
    {
       case S_IFDIR: return true;
+      case S_IFIFO:  printf("FIFO/pipe\n");               break;
+      case S_IFLNK:  printf("symlink\n");                 break;
+      case S_IFREG:  printf("regular file\n");            break;
+      case S_IFSOCK: printf("socket\n");                  break;
+      case S_IFBLK:  printf("block device\n");            break;
+      case S_IFCHR:  printf("character device\n");        break;
    }
 
 	return false;
+}
+
+// Same as above
+bool is_reg(const char* path) {
+
+	struct stat buf;
+
+	if (stat(path, &buf) == -1) {
+      perror("stat");
+   }
+
+   switch (buf.st_mode & S_IFMT)
+   {
+   	  case S_IFREG:  return true;	
+      case S_IFDIR:  printf("directory\n");               break;
+      case S_IFIFO:  printf("FIFO/pipe\n");               break;
+      case S_IFLNK:  printf("symlink\n");                 break;
+      case S_IFSOCK: printf("socket\n");                  break;
+      case S_IFBLK:  printf("block device\n");            break;
+      case S_IFCHR:  printf("character device\n");        break;
+  }
+
+  return false;
+
 }
 
 /* 
@@ -53,7 +83,26 @@ void process_directory(const char* path) {
    * done.
    */
 
+	// Increment num dirs
 	num_dirs = num_dirs + 1;
+
+	struct dirent *dp;
+	DIR *dir = opendir(path);
+
+	// Unable to open directory stream
+	if (!dir) {
+		printf("Unable to open directory.\n");
+		return;
+	}
+
+	// As long as there is something in the directory stream....
+	while((dp = readdir(dir)) != NULL) 
+	{
+	   printf("%s\n", dp->d_name);
+	}
+
+	// Close dir when all done
+	closedir(dir);
 
 }
 
