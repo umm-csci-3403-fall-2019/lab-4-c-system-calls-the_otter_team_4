@@ -21,12 +21,9 @@ bool is_dir(const char* path) {
    struct stat buf;
 
    // Actual stat(). If something is wrong, then print error. 
-   if (stat(argv[1], &buf) == -1) {
+   if (stat(path, &buf) == -1) {
       perror("stat");
    }
-
-   // Print statments for debugging. Delete when no longer necessary.
-   printf("File type:         ");
 
    // Check to see if is a directory
    switch (buf.st_mode & S_IFMT)
@@ -55,12 +52,13 @@ void process_directory(const char* path) {
    * with a matching call to chdir() to move back out of it when you're
    * done.
    */
+
+	num_dirs = num_dirs + 1;
+
 }
 
 void process_file(const char* path) {
-  /*
-   * Update the number of regular files.
-   */
+  num_regular = num_regular + 1;
 }
 
 void process_path(const char* path) {
