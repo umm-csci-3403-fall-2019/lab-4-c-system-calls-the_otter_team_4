@@ -28,15 +28,9 @@ bool is_dir(const char* path) {
    // Check to see if is a directory...otherwise return break and return false
    switch (buf.st_mode & S_IFMT)
    {
-      case S_IFDIR: return true;
-      case S_IFIFO:  printf("FIFO/pipe\n");               break;
-      case S_IFLNK:  printf("symlink\n");                 break;
-      case S_IFREG:  printf("regular file\n");            break;
-      case S_IFSOCK: printf("socket\n");                  break;
-      case S_IFBLK:  printf("block device\n");            break;
-      case S_IFCHR:  printf("character device\n");        break;
+      case S_IFDIR:  printf("directory\n");			return true;
    }
-
+   	printf("Not a directory\n");
 	return false;
 }
 
@@ -51,15 +45,10 @@ bool is_reg(const char* path) {
 
    switch (buf.st_mode & S_IFMT)
    {
-   	  case S_IFREG:  return true;	
-      case S_IFDIR:  printf("directory\n");               break;
-      case S_IFIFO:  printf("FIFO/pipe\n");               break;
-      case S_IFLNK:  printf("symlink\n");                 break;
-      case S_IFSOCK: printf("socket\n");                  break;
-      case S_IFBLK:  printf("block device\n");            break;
-      case S_IFCHR:  printf("character device\n");        break;
+   	  case S_IFREG:  printf("regular file\n");		return true;	
   }
 
+  printf("not a regular file\n")
   return false;
 
 }
@@ -83,13 +72,14 @@ void process_directory(const char* path) {
    * done.
    */
 
-	// Increment num dirs
+	// If the function is running, then we found a directory. Increment the count.
 	num_dirs = num_dirs + 1;
 
+	// Initialize
 	struct dirent *dp;
 	DIR *dir = opendir(path);
 
-	// Unable to open directory stream
+	// Error handling
 	if (!dir) {
 		printf("Unable to open directory.\n");
 		return;
@@ -98,7 +88,17 @@ void process_directory(const char* path) {
 	// As long as there is something in the directory stream....
 	while((dp = readdir(dir)) != NULL) 
 	{
+	   // Print the filename
 	   printf("%s\n", dp->d_name);
+
+	   // If it IS A DIRECTORY...call process directory recursively.
+	   // Note: This is not ready to run. chdir() needs to happen at some point before the recursion
+	   if (is_dir(dp->d_name)) {
+	      process_directory(dp->d_name);
+	   } else {
+	   	  // Otherwise, treat like a regular file. Increment count
+          process_file(dp->d_name);
+	   }
 	}
 
 	// Close dir when all done
