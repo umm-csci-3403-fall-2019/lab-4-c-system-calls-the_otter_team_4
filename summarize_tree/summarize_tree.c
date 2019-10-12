@@ -16,6 +16,25 @@ bool is_dir(const char* path) {
    * return value from stat in case there is a problem, e.g., maybe the
    * the file doesn't actually exist.
    */
+
+   // Initialize our stat object to be used for stat()
+   struct stat buf;
+
+   // Actual stat(). If something is wrong, then print error. 
+   if (stat(argv[1], &buf) == -1) {
+      perror("stat");
+   }
+
+   // Print statments for debugging. Delete when no longer necessary.
+   printf("File type:         ");
+
+   // Check to see if is a directory
+   switch (buf.st_mode & S_IFMT)
+   {
+      case S_IFDIR: return true;
+   }
+
+	return false;
 }
 
 /* 
