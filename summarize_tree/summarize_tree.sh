@@ -17,8 +17,8 @@ do
 done
 
 
-echo "There were $dirCount directories found."
-echo "There were $regCount regular files found."
+echo "There were $dirCount directories."
+echo "There were $regCount regular files."
 
 
 
