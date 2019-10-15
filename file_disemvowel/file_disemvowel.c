@@ -7,7 +7,8 @@
 #define BUF_SIZE 1024
 
 // Checks if the provided character is a vowel, lower or upper case
-bool isvowel(char const c) {
+bool isvowel(char const c) 
+{
   char cl = tolower(c);
   if(cl == 'a' || cl == 'e' || cl == 'i' || cl == 'o' || cl == 'u') {
     return true;
@@ -16,53 +17,59 @@ bool isvowel(char const c) {
   }
 }
 
-int copy_non_vowels(int num_chars, char* in_buf, char* out_buf){
+char *copy_non_vowels(char const *str){
 	int i, len, nvlen, pos;
-	
-	len = strlen(in_buf) + 1;
-	// non-vowel length
-	nvlen = 0;
 
-	// Loop through the input string and count the non-vowel characters
-	for(i=0; i<len; ++i) {
-		if(!isvowel(in_buf[i])) {
-			nvlen++;
-		}
-	}
-	
-	//out_buf = (char*) calloc(nvlen, sizeof(char));
-	
-	// Tracks position in output string
-	pos = 0;
-	
-	// Loops through input string and adds non-vowel characters to output string
-	for(i=0; i<len; ++i) {
-		if(!isvowel(in_buf[i])) {
-			out_buf[pos] = in_buf[i];
-			pos++;
-		}
-	}
+  	char* outstr;
+  
+  	len = strlen(str) + 1;
 
-	return nvlen;
+  	// non-vowel length
+  	nvlen = 0;
+
+  	// Loop through the input string and count the non-vowel characters
+  	for(i=0; i<len; ++i) {
+    	if(!isvowel(str[i])) {
+      	nvlen++;
+   		}
+  	}
+
+  	outstr = (char*) calloc(nvlen, sizeof(char));
+
+  // Tracks position in output string
+  pos = 0;
+
+  // Loops through input string and adds non-vowel characters to output string
+  for(i=0; i<len; ++i) {
+    if(!isvowel(str[i])) {
+      outstr[pos] = str[i];
+      pos++;
+    }
+  }
+
+  return outstr;
 }
 
-void disemvowel(FILE* inputFile, FILE* outputFile) {
-	char * buffer = calloc(BUF_SIZE, sizeof(char));
-	char * out_buf = calloc(BUF_SIZE, sizeof(char));
-	//long length;
 
-	while( fread(buffer, sizeof(char), BUF_SIZE, inputFile) != 0){
-		int nvlen = copy_non_vowels(BUF_SIZE, buffer, out_buf);
-		fwrite(out_buf, sizeof(char), nvlen, outputFile);
+
+void disemvowel(FILE* inputFile, FILE* outputFile) {
+
+	// We need memory for our buffer, and we will use the size provided in the orig. code.
+	char buff[BUF_SIZE];
+
+	while( fgets(buff, sizeof(buff), inputFile)) {
+
+		char* noVowels = copy_non_vowels(buff);
+
+		fputs(noVowels, outputFile);
+		free(noVowels);
+
 	}
 
-	free(buffer);
-	free(out_buf);
+	// Dont forget to free these files.
+	fclose(inputFile);
+	fclose(outputFile);
 
-  	fclose (inputFile);
-  	fclose(outputFile);
-
-  
 
 }
 
