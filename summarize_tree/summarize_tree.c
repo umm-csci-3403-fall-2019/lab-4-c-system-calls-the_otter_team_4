@@ -8,20 +8,7 @@
 
 static int num_dirs, num_regular;
 
-int getdir() {
-   char cwd[PATH_MAX];
-   if (getcwd(cwd, sizeof(cwd)) != NULL) {
-       printf("Current working dir: %s\n", cwd, "\n");
-   } else {
-       perror("getdir() error\n");
-       return 1;
-   }
-   return 0;
-}
-
 bool is_dir(const char* path) {
-
-	printf("\n==== checking is_dir ====\n");
 
   /*
    * Use the stat() function (try "man 2 stat") to determine if the file
@@ -32,80 +19,33 @@ bool is_dir(const char* path) {
    */
 
    // Initialize our stat object to be used for stat()
-
    struct stat *buf;
 
-   // Actual stat(). If something is wrong, then print error. 
-   // if (stat(path, &buf) == -1) {
-   //    perror("stat");
-   // }
-
-   // printf("File type:                ");
-
-           // switch (buf.st_mode & S_IFMT) {
-           // case S_IFBLK:  printf("block device\n");            break;
-           // case S_IFCHR:  printf("character device\n");        break;
-           // case S_IFDIR:  printf("directory\n");               break;
-           // case S_IFIFO:  printf("FIFO/pipe\n");               break;
-           // case S_IFLNK:  printf("symlink\n");                 break;
-           // case S_IFREG:  printf("regular file\n");            break;
-           // case S_IFSOCK: printf("socket\n");                  break;
-           // default:       printf("unknown?\n");                break;
-           // }
-           // return false;
-
-
-   // Check to see if is a directory...otherwise return break and return false
-   // if(stat(path, &buf) == 0) {
-   // 	if (S_ISDIR(buf.st_mode)) {
-   // 		return true;
-   // 	}
-
- //   	printf("Not a directory\n");
- //   	return false;
- //   }
- //   	printf("Checkdir failed. Something's wrong\n");
-	// return false;
-
+   // Allocate memory for the output of 'stat'
    buf = malloc(sizeof(struct stat));
 
-   getdir();
+   // some error handling
+   	if (stat(path, buf) != 0) {
+      perror("stat");
+   }
 
-   stat(path, buf);
-   if (S_ISDIR(buf->st_mode)) {
+
+   // Check the output of stat. 
+   // If st_mode indicates the file is a directory, then process it as such.
+   // Otherwise, process is like a regular file.
+   if (S_ISDIR(buf->st_mode)) 
+   {
    	free(buf);
-   	printf("*** directory identified: ");
-   	printf(path);
-   	printf("\n");
    	return true;
-   } else {
+   } 
+   else 
+   {
    	free(buf);
-   	printf("!!! directory not identified: ");
-   	printf(path);
-   	printf("\n");
    	return false;
    }
 
 }
 
-// Same as above
-// bool is_reg(const char* path) {
-
-// 	struct stat buf;
-
-// 	if (stat(path, &buf) == -1) {
-//       perror("stat");
-//    }
-
-//    switch (buf.st_mode & S_IFMT)
-//    {
-//    	  case S_IFREG:  printf("regular file\n");		return true;	
-//   }
-
-//   printf("not a regular file\n");
-//   return false;
-
-// }
 
 /* 
  * I needed this because the multiple recursion means there's no way to
@@ -114,9 +54,6 @@ bool is_dir(const char* path) {
 void process_path(const char*);
 
 void process_directory(const char* path) {
-
-	printf("\n==== processing directory ====\n");
-	getdir();
 
   /*
    * Update the number of directories seen, use opendir() to open the
@@ -133,63 +70,55 @@ void process_directory(const char* path) {
 	// If the function is running, then we found a directory. Increment the count.
 	num_dirs = num_dirs + 1;
 
+	// Jump into this directory so we can beign working.
+	chdir(path);
+
 	// Initialize
 	struct dirent *dp;
-	DIR *dir = opendir(path);
+	DIR *dir = opendir(".");
 
 	// Error handling
 	if (!dir) {
-		printf("Unable to open directory.\n");
 		return;
 	}
-
-	chdir(path);
 
 	// As long as there is something in the directory stream....
 	while((dp = readdir(dir)) != NULL) 
 	{
 
+		 // CHECK: If the directory is NOT the current one AND not the parent...
 		 if( strcmp(dp->d_name, "..") != 0  && strcmp(dp->d_name, ".") != 0) {
-	   		// Print the filename
-	  	 	printf("%s\n", dp->d_name);
 
-	  	 	char str[PATH_MAX];
-	  	 	strcpy(str, path);
-	  	 	strcpy(str, "/");
-	  	 	strcpy(str, dp->d_name);
-
-	  	 	printf("Path constructed.");
-	  	 	printf(str);
-	   		// If it IS A DIRECTORY...call process directory recursively.
-	   		// Note: This is not ready to run. chdir() needs to happen at some point before the recursion
-	   		// Also: See Nic's notes above on the '.' and '..' directories
-	  	 	chdir(dp->d_name);
+	   		// ... then call process_path recursively.
 	  	 	process_path(dp->d_name);
 		}
 	}
 
-	// Close dir when all done
-	printf("Moving up a directory...\n");
-	chdir("..");
+	// Close dir when all done. Also free dp since we are done with it now.
 	closedir(dir);
+	free(dp);
 
+	// Jump back up a directory.
+	chdir("..");
+	
 }
 
+
+// If we've identified a regular file, then increment the count.
 void process_file(const char* path) {
-  num_regular = num_regular + 1;
-  printf("Processing file\n");
+  num_regular++;
 }
 
+// Here we see if the specified path gives us an actual directory, or just a regular file.
 void process_path(const char* path) {
-	printf("\n==== processing path ====\n");
-	printf(path);
-	printf("\n==============================\n");
   if (is_dir(path)) {
     process_directory(path);
   } else {
     process_file(path);
   }
 }
+
+
 
 int main (int argc, char *argv[]) {
   // Ensure an argument was provided.
@@ -199,17 +128,8 @@ int main (int argc, char *argv[]) {
     return 1;
   }
 
-  printf("*************\n");
-  printf("*************\n");
-  printf("*************\n");
-  printf("\n==== running main ====\n");
-
   num_dirs = 0;
   num_regular = 0;
-
-  printf("Argv1: \n");
-  printf(argv[1]);
-  printf("\n");
 
   process_path(argv[1]);
 
