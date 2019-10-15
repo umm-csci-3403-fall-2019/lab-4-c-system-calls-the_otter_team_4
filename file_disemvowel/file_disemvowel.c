@@ -57,16 +57,21 @@ void disemvowel(FILE* inputFile, FILE* outputFile) {
 	// We need memory for our buffer, and we will use the size provided in the orig. code.
 	char buff[BUF_SIZE];
 
+	// While there is stuff to grab from the input file...try to fill up the buffer
 	while( fgets(buff, sizeof(buff), inputFile)) {
 
+		// then pull the vowels out...
 		char* noVowels = copy_non_vowels(buff);
 
+		// ... and put it into the 'outputFile'
 		fputs(noVowels, outputFile);
+
+		// Now were done, so free this.
 		free(noVowels);
 
 	}
 
-	// Dont forget to free these files.
+	// Dont forget to clsoe these files.
 	fclose(inputFile);
 	fclose(outputFile);
 
