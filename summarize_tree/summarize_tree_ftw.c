@@ -32,8 +32,8 @@ int main(int argc, char** argv) {
 	num_regular = 0;
     ftw(argv[1], callback, MAX_FTW_DEPTH);
 
-    printf("The number of directories was %d.\n", num_dirs);
-    printf("The number of regular files was %d.\n", num_regular);
+    printf("There were %d directories.\n", num_dirs);
+  	printf("There were %d regular files.\n", num_regular);
 
     return 0;
 }
